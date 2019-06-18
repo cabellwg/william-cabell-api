@@ -1,13 +1,10 @@
 .DS_Store
 .auth_keys.json
 contact.txt
-node_modules
-/dist
 static
 templates
 flask_env
-p3_6env
-p3_7env
+p3_*env
 
 # local env files
 .env.local

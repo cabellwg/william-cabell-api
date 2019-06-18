@@ -1,3 +1,5 @@
-node_modules
-p3_6env
+p3_*env
 idea
+.travis.yml
+.gitignore
+.git

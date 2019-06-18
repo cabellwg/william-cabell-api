@@ -1,12 +1,8 @@
 init:
-	pip3 install virtualenv; \
-	virtualenv -p python3.7 p3_7env --no-site-packages; \
+	pip3 install virtualenv;
+	python3.7 -m virtualenv -p python3.7 p3_7env --no-site-packages; \
 	. ./p3_7env/bin/activate; \
 	pip install -r requirements.txt
-	cd vue_app; yarn && yarn build --modern
-	-mkdir flask_app/logs
-	-touch flask_app/logs/contact.txt
-	-chmod 666 flask_app/logs/contact.txt
 
 test:
 	. ./p3_7env/bin/activate; \
