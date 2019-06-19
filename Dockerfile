@@ -15,7 +15,7 @@ WORKDIR /app
 RUN make init
 
 # Production stage
-FROM python3.7-alpine as prod
+FROM python:3.7-alpine as prod
 
 COPY --from=build /app /app
 COPY . /app
