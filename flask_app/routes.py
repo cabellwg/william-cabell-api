@@ -14,8 +14,9 @@ def apply_routes(app):
     @cross_origin(allow_headers=['Content-Type'])
     def contact():
         """Route for the contact form."""
-        send_contact_email(request.get_json())
-        return jsonify_no_content(app, 200)
+        if send_contact_email(request.get_json()):
+            return jsonify_no_content(app, 200)
+        return jsonify_no_content(app, 400)
 
 
 def jsonify_no_content(app, status):

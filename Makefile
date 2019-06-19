@@ -7,7 +7,7 @@ init:
 test:
 	. ./p3_7env/bin/activate; \
 	export ENV test; \
-	python -m unittest discover -vcs tests
+	coverage run --source flask_app -m unittest discover -vcs tests
 
 dev:
 	. ./p3_7env/bin/activate; \

@@ -7,11 +7,16 @@ def send_contact_email(contact):
     """Sends me an email with the information someone has sent me.
 
     :param contact: The information to send.
+    :returns: True if there were no errors, false if there were validation
+    errors.
     """
     name = contact.get("name") or ""
     org = contact.get("organization") or ""
     email = contact.get("email") or ""
     msg = contact.get("message") or ""
+
+    if name == "" or email == "" or msg == "":
+        return False
 
     # Construct message
     text = "+===========================\n+\n+ "
@@ -25,3 +30,5 @@ def send_contact_email(contact):
 
     yag = yagmail.SMTP("william16180@gmail.com", oauth2_file="/run/secrets/gmail-keys")
     yag.send("william16180@gmail.com", "Someone used the form!", text)
+
+    return True
