@@ -1,7 +1,7 @@
 from flask import request, make_response
 from flask_cors import cross_origin
 
-from flask_app.contact import add_contact
+from flask_app.contact import send_contact_email
 
 
 def apply_routes(app):
@@ -14,7 +14,7 @@ def apply_routes(app):
     @cross_origin(allow_headers=['Content-Type'])
     def contact():
         """Route for the contact form."""
-        add_contact(request.get_json())
+        send_contact_email(request.get_json())
         return jsonify_no_content(app, 200)
 
 

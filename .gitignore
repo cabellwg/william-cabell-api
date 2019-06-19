@@ -1,5 +1,6 @@
 .DS_Store
 .auth_keys.json
+.gmail_keys.json
 contact.txt
 static
 templates
@@ -9,11 +10,6 @@ p3_*env
 # local env files
 .env.local
 .env.*.local
-
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Editor directories and files
 .idea

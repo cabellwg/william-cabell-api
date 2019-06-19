@@ -1,11 +1,15 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_cors import CORS
-from flaskext.mail import Mail
 
 from flask_app.routes import apply_routes
 
 
 def create_app(test_config=None):
+    """Builds the Flask app.
+
+    :param test_config: An optional test configuration for testing.
+    :return: The application.
+    """
     app = Flask(__name__)
 
     if test_config is None:
@@ -14,9 +18,11 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     CORS(app, resources={r"/api/*": {"origins": r"williamcabell.me/*"}})
+    apply_routes(app)
 
     return app
 
 
 if __name__ == "__main__":
-    app.run()
+    the_app = create_app()
+    the_app.run()
