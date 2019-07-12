@@ -11,7 +11,8 @@ def apply_routes(app):
     """
 
     @app.route("/contact")
-    @cross_origin(origins=["https://williamcabell.me"],
+    @cross_origin(origins=["https://williamcabell.me",
+                           "https://www.williamcabell.me"],
                   allow_headers=["Content-Type"],
                   methods=["POST"])
     def contact():
