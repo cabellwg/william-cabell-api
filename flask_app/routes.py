@@ -10,8 +10,10 @@ def apply_routes(app):
     :param app: The Flask app to which to apply the routes.
     """
 
-    @app.route("/contact", methods=["POST"])
-    @cross_origin(allow_headers=['Content-Type'])
+    @app.route("/contact")
+    @cross_origin(origins=["https://williamcabell.me"],
+                  allow_headers=["Content-Type"],
+                  methods=["POST"])
     def contact():
         """Route for the contact form."""
         if send_contact_email(request.get_json()):

@@ -4,3 +4,4 @@ flask_cors==3.0.7
 yagmail==0.11.220
 coverage==4.0.3
 coveralls==1.5.1
+pytz==2019.1
