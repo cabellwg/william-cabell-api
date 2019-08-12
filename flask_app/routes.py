@@ -21,6 +21,11 @@ def apply_routes(app):
             return jsonify_no_content(app, 200)
         return jsonify_no_content(app, 400)
 
+    @app.route("/healthcheck", methods=["GET"])
+    def healthcheck():
+        """Route for the healthcheck."""
+        return b"", 200
+
 
 def jsonify_no_content(app, status):
     """Creates a response with no content with MIME type application/json.

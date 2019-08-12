@@ -41,4 +41,7 @@ COPY --from=build /app /app
 COPY . /app
 WORKDIR /app
 
+HEALTHCHECK --timeout=5s --start-period=10s \
+  CMD ["/app/p3_7env/bin/python", "/app/healthcheck.py"]
+
 ENTRYPOINT ["/app/p3_7env/bin/uwsgi", "--ini", "/app/uwsgi/williamcabell.ini"]
