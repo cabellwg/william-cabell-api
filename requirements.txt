@@ -1,8 +1,8 @@
-Flask==1.0.2
+Flask==1.1.2
 uwsgi==2.0.18
-flask_cors==3.0.7
-yagmail==0.11.220
-coverage==4.0.3
-coveralls==1.5.1
-pytz==2019.1
-requests==2.22.0
+flask_cors==3.0.8
+coverage==5.1
+coveralls==2.0.0
+pytz==2019.3
+requests==2.23.0
+sendgrid==6.2.2

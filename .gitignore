@@ -1,6 +1,7 @@
 .DS_Store
 .auth_keys.json
 .gmail_keys.json
+credentials.json
 contact.txt
 static
 templates
