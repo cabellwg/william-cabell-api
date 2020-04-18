@@ -3,3 +3,4 @@ idea
 .travis.yml
 .gitignore
 .git
+.coverage
