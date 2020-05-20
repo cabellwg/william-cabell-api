@@ -45,7 +45,6 @@ def build_bp(app):
         except ContactInfoException as e:
             return jsonify({"msg": "{}".format(e.msg)}), 400
 
-        print(app.config["CORS_ALLOWED_ORIGINS"])
         sg = sendgrid.SendGridAPIClient(api_key=app.config["SENDGRID_API_KEY"])
 
         # Send email
