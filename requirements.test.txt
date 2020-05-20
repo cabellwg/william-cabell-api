@@ -1,0 +1,9 @@
+Flask==1.1.2
+uwsgi==2.0.18
+flask_cors==3.0.8
+coverage==5.1
+coveralls==2.0.0
+pytz==2020.1
+requests==2.23.0
+sendgrid==6.3.1
+sentry-sdk[flask]==0.14.4

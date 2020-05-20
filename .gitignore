@@ -1,5 +1,6 @@
 .DS_Store
-.auth_keys.json
+.*auth_keys.json
+.*auth-keys.json
 .gmail_keys.json
 credentials.json
 contact.txt

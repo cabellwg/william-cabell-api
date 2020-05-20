@@ -1,27 +1,16 @@
-import os
 import unittest
 from unittest.mock import patch
 
 import flask_app
 
 
-def true_util():
-    return True
-
-
 class TestContact(unittest.TestCase):
     """Tests the contact API."""
 
-    def setUp(self):
+    @patch("flask_app.sentry_sdk", autospec=True)
+    def setUp(self, _):
         """Runs before each test method."""
-        self.client = flask_app.create_app({'TESTING': True}).test_client()
-        with open(".auth_keys.json", 'w') as mock_auth_file:
-            mock_auth_file.truncate(0)
-            mock_auth_file.write("{\"sendgrid\": \"mock_api_key_string\"}")
-
-    def tearDown(self):
-        """Runs after each test method."""
-        os.remove(".auth_keys.json")
+        self.client = flask_app.create_app(test_env="test").test_client()
 
     @patch("flask_app.contact.sendgrid", autospec=True)
     def test_contact_normal(self, _):
@@ -36,8 +25,7 @@ class TestContact(unittest.TestCase):
                        "I promise – had some myself last week – alright, always"
                        " happy to do business with you."
         }
-        r = self.client.post('/contact', json=test_data_normal)
-        print(r.data)
+        r = self.client.post("/contact", json=test_data_normal)
         self.assertEqual(200, r.status_code)
 
     @patch("flask_app.contact.sendgrid", autospec=True)
@@ -50,9 +38,8 @@ class TestContact(unittest.TestCase):
                        "this process is too small to contain."
         }
 
-        self.assertEqual(200, self.client.post('/contact',
-                                               json=test_data_without_org
-                                               ).status_code)
+        r = self.client.post("/contact", json=test_data_without_org)
+        self.assertEqual(200, r.status_code)
 
     @patch("flask_app.contact.sendgrid", autospec=True)
     def test_contact_dirty(self, _):
@@ -62,10 +49,9 @@ class TestContact(unittest.TestCase):
             "email": "test@test"
         }
 
-        self.assertEqual(400, self.client.post('/contact',
-                                               json=test_data_dirty_input
-                                               ).status_code)
+        r = self.client.post("/contact", json=test_data_dirty_input)
+        self.assertEqual(400, r.status_code)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

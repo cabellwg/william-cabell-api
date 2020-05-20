@@ -1,6 +1,9 @@
 p3_*env
-idea
+.idea
 .travis.yml
 .gitignore
 .git
 .coverage
+.*auth-keys.json
+requirements.dev.txt
+requirements.test.txt

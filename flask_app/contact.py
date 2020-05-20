@@ -1,66 +1,95 @@
 import datetime
-import json
-import os
 
 import sendgrid
 
+from flask import (
+    Blueprint, jsonify, request
+)
+from flask_cors import cross_origin
 from pytz import timezone
-from sendgrid.helpers.mail import *
+from sendgrid.helpers.mail import Content, Email, To, Mail
+from sentry_sdk import capture_exception
 
-from flask_app.errors import FormValidationException, \
-    APIKeyReadException, \
-    SendGridConnectionException
-
-MY_EMAIL_ADDR = "william16180@gmail.com"
-SERVER_EMAIL_ADDR = "contact-form@williamcabell.me"
+from .errors import ContactInfoException
 
 
-def send_contact_email(contact):
-    """Writes a new message on the system with the information someone has sent me.
+def build_bp(app):
+    """Factory wrapper for contact blueprint.
 
-    :param contact: The information to send.
-    :returns: True if there were no errors, false if there were validation
-    errors.
+    :param app: The app, to get configuration settings.
+    :return: A blueprint for the contact API.
     """
-    name = contact.get("name")
-    org = contact.get("organization") or "Not given"
-    email_addr = contact.get("email")
-    msg = contact.get("message")
+    bp = Blueprint("contact", __name__)
 
+    # Begin route definitions
+
+    @bp.route("/contact", methods=["POST"])
+    @cross_origin(origins=app.config["CORS_ALLOWED_ORIGINS"],
+                  allow_headers=["Content-Type"],
+                  methods=["POST"])
+    def send_contact_email():
+        """Emails me with the information someone has sent me.
+
+        :return: One of the following:
+            200 if the message was sent,
+            400 if the message was invalid,
+            500 if the server had a problem sending the email.
+        """
+        try:
+            email = construct_email({
+                "name": request.json.get("name"),
+                "org": request.json.get("organization") or "Not given",
+                "email": request.json.get("email"),
+                "msg": request.json.get("message")
+            }, app.config["SERVER_EMAIL_ADDR"], app.config["MY_EMAIL_ADDR"])
+        except ContactInfoException as e:
+            return jsonify({"msg": "{}".format(e.msg)}), 400
+
+        print(app.config["CORS_ALLOWED_ORIGINS"])
+        sg = sendgrid.SendGridAPIClient(api_key=app.config["SENDGRID_API_KEY"])
+
+        # Send email
+        try:
+            sg.send(email)
+        except Exception as e:
+            capture_exception(e)
+            return jsonify({"msg": "Encountered unexpected server error"}), 500
+
+        return jsonify({}), 200
+
+    # End route definitions
+
+    return bp
+
+
+def construct_email(primitives, server_addr, my_addr):
+    """Tries to build an email from the information in the request.
+
+    :param primitives: The raw request information.
+    :param server_addr: The email address of the server.
+    :param my_addr: My email address.
+    :return
+    """
     # Validate input
-    if name is None or email_addr is None or msg == "" or msg is None:
-        raise FormValidationException("Invalid form data")
+    for (key, item) in primitives.items():
+        if item is None:
+            raise ContactInfoException(msg="Missing attribute: \"{}\"".format(key))
+        if not isinstance(item, str) or not len(item) > 0:
+            raise ContactInfoException(msg="Attribute \"{}\" must be a nonempty string".format(key))
 
     # Construct body of message
     tz = timezone("EST")
-    text = "Name: {}\n".format(name)
-    text += "Organization: {}\n".format(org)
-    text += "Email: {}\n".format(email_addr)
+    text = "Name: {}\n".format(primitives["name"])
+    text += "Organization: {}\n".format(primitives["org"])
+    text += "Email: {}\n".format(primitives["email"])
     text += "{}UTC\n".format(datetime.datetime.utcnow())
     text += "{}EST\n".format(datetime.datetime.now(tz))
     text += "---------------------\n"
-    text += "Message: {}\n".format(msg)
+    text += "Message: {}\n".format(primitives["msg"])
 
     # Construct email
     body = Content("text/plain", text)
     subj = "Someone used the form!"
-    server_email = Email(SERVER_EMAIL_ADDR)
-    my_email = To(MY_EMAIL_ADDR)
-    email_msg = Mail(server_email, my_email, subj, body)
-
-    # Get API key
-    api_key_file = ".auth_keys.json"
-    if not os.path.exists(api_key_file):
-        raise APIKeyReadException("API key file does not exist")
-    with open(api_key_file, 'r') as auth_file:
-        sendgrid_api_key = json.loads(auth_file.read())["sendgrid"]
-        if len(sendgrid_api_key) == 0:
-            raise APIKeyReadException("Length is 0")
-        sg = sendgrid.SendGridAPIClient(api_key=sendgrid_api_key)
-
-        # Send email
-        try:
-            sg.send(email_msg)
-        except Exception as e:
-            print(e)
-            raise SendGridConnectionException("Connection to SendGrid failed")
+    server_email = Email(server_addr)
+    my_email = To(my_addr)
+    return Mail(server_email, my_email, subj, body)
